@@ -2,15 +2,13 @@ package com.backend.IPv4.entity;
 
 import jakarta.persistence.*;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "users")  // Optional: specify table name explicitly
 public class UserEntity {
-	
-	
-	
-	@Id
+    
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -20,19 +18,19 @@ public class UserEntity {
     private String role = "USER";
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference  // <-- Allows serialization of progress list without recursion
+    @JsonManagedReference  // Helps with JSON serialization (avoids recursion)
     private List<ProgressEntity> progress;
+
 
     public UserEntity() {}
 
     public UserEntity(String email, String password) {
         this.email = email;
         this.password = password;
-    }	
-	
-		
+    }   
 
     // Getters and setters
+
     public Long getId() {
         return id;
     }
@@ -80,4 +78,6 @@ public class UserEntity {
     public void setProgress(List<ProgressEntity> progress) {
         this.progress = progress;
     }
+
+ 
 }

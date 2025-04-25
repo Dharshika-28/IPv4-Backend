@@ -1,3 +1,4 @@
+
 package com.backend.IPv4.repository;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import com.backend.IPv4.entity.UserEntity;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-	Optional<UserEntity> findByEmail(String email);	
+	UserEntity findByEmail(String email);	
 	Optional<UserEntity> findByEmailAndPassword(String email, String password);
     UserEntity findByUsername(String username);
 

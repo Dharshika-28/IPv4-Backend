@@ -20,16 +20,16 @@ public class UserService {
     }
     
     // Get user by email (returning user details)
-    public Optional<UserEntity> getUserByEmail(String email) {
+    public UserEntity getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // Get only the username by email (for the new endpoint)
-    public Optional<String> getUsernameByEmail(String email) {
-        Optional<UserEntity> user = userRepository.findByEmail(email);
-        return user.map(UserEntity::getUsername);
-    }
-    
+//    // Get only the username by email (for the new endpoint)
+//    public Optional<String> getUsernameByEmail(String email) {
+//        Optional<UserEntity> user = userRepository.findByEmail(email);
+//        return user.map(UserEntity::getUsername);
+//    }
+//    
     public UserEntity getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }

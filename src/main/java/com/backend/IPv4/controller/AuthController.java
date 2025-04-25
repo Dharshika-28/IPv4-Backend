@@ -1,10 +1,9 @@
 package com.backend.IPv4.controller;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,9 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.backend.IPv4.dto.LoginRequest;
 import com.backend.IPv4.entity.AdminEntity;
+import com.backend.IPv4.entity.LoginHistory;
 import com.backend.IPv4.entity.ProgressEntity;
 import com.backend.IPv4.entity.UserEntity;
 import com.backend.IPv4.repository.AdminRepository;
+import com.backend.IPv4.repository.LoginHistoryRepository;
 import com.backend.IPv4.repository.ProgressRepository;
 import com.backend.IPv4.repository.UserRepository;
 import com.backend.IPv4.service.AdminService;
@@ -26,11 +27,12 @@ import com.backend.IPv4.service.UserService;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired  private UserService userService;
+    @Autowired private UserService userService;
     @Autowired private AdminService adminService;
     @Autowired private AdminRepository adminRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private ProgressRepository progressRepository;
+    @Autowired private LoginHistoryRepository loginHistoryRepository;
 
     // User registration
     @PostMapping("/signup")
@@ -46,36 +48,38 @@ public class AuthController {
         return ResponseEntity.ok(adminService.register(admin));
     }
 
-    // Login
+    // Login for User or Admin with login history save
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         System.out.println("[Login] Attempt for email: " + loginRequest.getEmail());
 
         Optional<UserEntity> user = userRepository.findByEmailAndPassword(
-            loginRequest.getEmail(),
-            loginRequest.getPassword()
-        );
+            loginRequest.getEmail(), loginRequest.getPassword());
 
         if (user.isPresent()) {
-            System.out.println("[Login] User found: " + user.get().getUsername());
+            String username = user.get().getUsername();
+            String email = user.get().getEmail();
+            saveLoginHistory(username, request.getRemoteAddr(), "Unknown");
+
             Map<String, Object> response = new HashMap<>();
             response.put("role", "user");
-            response.put("username", user.get().getUsername());
-            response.put("email", user.get().getEmail());
+            response.put("username", username);
+            response.put("email", email);
             return ResponseEntity.ok(response);
         }
 
         Optional<AdminEntity> admin = adminRepository.findByEmailAndPassword(
-            loginRequest.getEmail(),
-            loginRequest.getPassword()
-        );
+            loginRequest.getEmail(), loginRequest.getPassword());
 
         if (admin.isPresent()) {
-            System.out.println("[Login] Admin found: " + admin.get().getName());
+            String username = admin.get().getName();
+            String email = admin.get().getEmail();
+            saveLoginHistory(username, request.getRemoteAddr(), "Unknown");
+
             Map<String, Object> response = new HashMap<>();
             response.put("role", "admin");
-            response.put("username", admin.get().getName());
-            response.put("email", admin.get().getEmail());
+            response.put("username", username);
+            response.put("email", email);
             return ResponseEntity.ok(response);
         }
 
@@ -83,7 +87,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
 
-    // Fetch username by email - GET method
+    // Fetch progress by username
     @GetMapping("/login/{username}")
     public ResponseEntity<?> getProgressByUsername(@PathVariable String username) {
         UserEntity user = userRepository.findByUsername(username.trim());
@@ -94,11 +98,16 @@ public class AuthController {
         }
 
         List<ProgressEntity> progressList = progressRepository.findByUser(user);
-
         return ResponseEntity.ok(progressList);
     }
 
-
-
-
+    // Helper method to save login history
+    private void saveLoginHistory(String username, String ip, String location) {
+        LoginHistory history = new LoginHistory();
+        history.setUsername(username);
+        history.setTime(LocalDateTime.now().toString());
+        history.setIp(ip);
+        history.setLocation(location);
+        loginHistoryRepository.save(history);
+    }
 }
