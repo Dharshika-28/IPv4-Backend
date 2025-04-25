@@ -2,6 +2,7 @@ package com.backend.IPv4.controller;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.backend.IPv4.dto.LoginRequest;
 import com.backend.IPv4.entity.AdminEntity;
+import com.backend.IPv4.entity.ProgressEntity;
 import com.backend.IPv4.entity.UserEntity;
 import com.backend.IPv4.repository.AdminRepository;
+import com.backend.IPv4.repository.ProgressRepository;
 import com.backend.IPv4.repository.UserRepository;
 import com.backend.IPv4.service.AdminService;
 import com.backend.IPv4.service.UserService;
@@ -23,17 +26,11 @@ import com.backend.IPv4.service.UserService;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private AdminService adminService;
-
-    @Autowired
-    private AdminRepository adminRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired  private UserService userService;
+    @Autowired private AdminService adminService;
+    @Autowired private AdminRepository adminRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private ProgressRepository progressRepository;
 
     // User registration
     @PostMapping("/signup")
@@ -87,26 +84,21 @@ public class AuthController {
     }
 
     // Fetch username by email - GET method
-    @GetMapping("/login/{email}")
-    public ResponseEntity<?> getUsernameByEmail(@PathVariable String email) {
-        System.out.println("[GET Username] Requested email: " + email);
+    @GetMapping("/login/{username}")
+    public ResponseEntity<?> getProgressByUsername(@PathVariable String username) {
+        UserEntity user = userRepository.findByUsername(username.trim());
 
-        if (email == null || email.trim().isEmpty()) {
-            System.out.println("[GET Username] Email is null or empty");
-            return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("message", "Email is required"));
-        }
-
-        Optional<UserEntity> user = userService.getUserByEmail(email.trim());
-
-        if (user.isPresent()) {
-            System.out.println("[GET Username] Username found: " + user.get().getUsername());
-            return ResponseEntity.ok(Collections.singletonMap("username", user.get().getUsername()));
-        } else {
-            System.out.println("[GET Username] User not found for email: " + email);
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("message", "User not found"));
+                .body(Collections.singletonMap("message", "User not found"));
         }
+
+        List<ProgressEntity> progressList = progressRepository.findByUser(user);
+
+        return ResponseEntity.ok(progressList);
     }
+
+
+
 
 }

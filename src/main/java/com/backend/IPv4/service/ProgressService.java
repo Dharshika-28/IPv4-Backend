@@ -23,18 +23,19 @@ public class ProgressService {
     }
     
     public ProgressEntity saveOrUpdateProgress(ProgressEntity progress) {
-    	if (progress.getUser() == null || progress.getUser().getUsername() == null) {
-    	    throw new IllegalArgumentException("Sam get the bug");
-    	}
+        if (progress == null) {
+            throw new IllegalArgumentException("Progress must not be null");
+        }
+        if (progress.getUser() == null || progress.getUser().getUsername() == null) {
+            throw new IllegalArgumentException("Progress or user information is missing");
+        }
 
-        // 🛠️ Fetch managed UserEntity
         UserEntity user = userRepository.findByUsername(progress.getUser().getUsername());
-
         if (user == null) {
             throw new IllegalArgumentException("User not found: " + progress.getUser().getUsername());
         }
 
-        progress.setUser(user); // ✅ Attach the fetched (managed) user
+        progress.setUser(user);
 
         ProgressEntity existing = progressRepository.findByUserAndModuleNameAndSectionName(
             user, progress.getModuleName(), progress.getSectionName());
@@ -47,5 +48,6 @@ public class ProgressService {
             return progressRepository.save(progress);
         }
     }
+
 
 }

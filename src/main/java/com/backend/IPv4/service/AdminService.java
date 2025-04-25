@@ -19,9 +19,4 @@ public class AdminService {
         return adminRepository.save(admin);
     }
 
-    public Optional<AdminEntity> login(String email, String password) {
-        return adminRepository.findByEmail(email)
-                .filter(admin -> admin.getPassword().equals(password));
-    }
-
 }

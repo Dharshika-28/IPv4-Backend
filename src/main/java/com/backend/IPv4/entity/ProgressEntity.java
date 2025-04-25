@@ -1,42 +1,47 @@
 package com.backend.IPv4.entity;
 
+import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
 public class ProgressEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+	    @ManyToOne
+	    @JoinColumn(name = "user_id", nullable = false)
+	    @JsonBackReference  // <-- Prevents recursion on serialization
+	    private UserEntity user;
 
-    private String moduleName;
-    private String sectionName;
-    private boolean completed;
-    private int progressPercentage;
+	    private String moduleName;
+	    private String sectionName;
+	    private boolean completed;
+	    private int progressPercentage;
 
-    public ProgressEntity() {}
+	    public ProgressEntity() {}
 
-    public ProgressEntity(UserEntity user, String moduleName, String sectionName, boolean completed, int progressPercentage) {
-        this.user = user;
-        this.moduleName = moduleName;
-        this.sectionName = sectionName;
-        this.completed = completed;
-        this.progressPercentage = progressPercentage;
-    }
+	    public ProgressEntity(UserEntity user, String moduleName, String sectionName, boolean completed, int progressPercentage) {
+	        this.user = user;
+	        this.moduleName = moduleName;
+	        this.sectionName = sectionName;
+	        this.completed = completed;
+	        this.progressPercentage = progressPercentage;
+	    }
 
     public Long getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
-
+    public void setId(Long id) { this.id = id; }  
+    
     public UserEntity getUser() { return user; }
 
-    public void setUser(UserEntity user) { this.user = user; }
+	public void setUser(UserEntity user) { this.user = user; }
 
-    public String getModuleName() { return moduleName; }
+	public String getModuleName() { return moduleName; }
 
     public void setModuleName(String moduleName) { this.moduleName = moduleName; }
 
@@ -51,4 +56,5 @@ public class ProgressEntity {
     public int getProgressPercentage() { return progressPercentage; }
 
     public void setProgressPercentage(int progressPercentage) { this.progressPercentage = progressPercentage; }
+
 }
