@@ -110,4 +110,38 @@ public class AuthController {
         history.setLocation(location);
         loginHistoryRepository.save(history);
     }
+    
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+
+        UserEntity user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "User not found. Please sign up first."));
+        }
+
+        // Just verify and allow redirect
+        return ResponseEntity.ok(Map.of("message", "User verified."));
+    }
+    
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String newPassword = request.get("newPassword");
+
+        UserEntity user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "User not found."));
+        }
+
+        user.setPassword(newPassword); // You can encode if needed
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully."));
+        
+    }
+   
 }

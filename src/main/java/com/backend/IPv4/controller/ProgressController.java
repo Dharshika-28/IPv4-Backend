@@ -1,8 +1,11 @@
 package com.backend.IPv4.controller;
 
+import com.backend.IPv4.entity.FinalQuizRequest;
+import com.backend.IPv4.entity.FinalQuizResult;
 import com.backend.IPv4.entity.LoginHistory;
 import com.backend.IPv4.entity.ProgressEntity;
 import com.backend.IPv4.entity.UserEntity;
+import com.backend.IPv4.repository.FinalQuizRepository;
 import com.backend.IPv4.repository.LoginHistoryRepository;
 import com.backend.IPv4.repository.UserRepository;
 import com.backend.IPv4.service.ProgressService;
@@ -83,4 +86,18 @@ public class ProgressController {
     public ProgressEntity saveProgress(@RequestBody ProgressEntity progress) {
         return progressService.saveOrUpdateProgress(progress);
     }
+    
+    
+    
+    public void FinalQuizController(ProgressService progressService) {
+        this.progressService = progressService;
+    }
+
+    @PostMapping("/final-quiz")
+    public ResponseEntity<?> saveFinalQuizResult(@RequestBody FinalQuizRequest request) {
+        progressService.saveFinalQuizResult(request);
+        return ResponseEntity.ok("Final quiz result saved successfully");
+    }
+
+
 }

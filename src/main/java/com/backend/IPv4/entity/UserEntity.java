@@ -5,7 +5,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "users")  // Optional: specify table name explicitly
 public class UserEntity {
     
     @Id
@@ -21,6 +20,9 @@ public class UserEntity {
     @JsonManagedReference  // Helps with JSON serialization (avoids recursion)
     private List<ProgressEntity> progress;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<FinalQuizResult> finalQuizResults;
 
     public UserEntity() {}
 
@@ -78,6 +80,15 @@ public class UserEntity {
     public void setProgress(List<ProgressEntity> progress) {
         this.progress = progress;
     }
+
+	public List<FinalQuizResult> getFinalQuizResults() {
+		return finalQuizResults;
+	}
+
+	public void setFinalQuizResults(List<FinalQuizResult> finalQuizResults) {
+		this.finalQuizResults = finalQuizResults;
+	}
+
 
  
 }

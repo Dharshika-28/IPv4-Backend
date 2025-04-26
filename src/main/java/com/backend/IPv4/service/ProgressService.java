@@ -1,7 +1,10 @@
 package com.backend.IPv4.service;
 
+import com.backend.IPv4.entity.FinalQuizRequest;
+import com.backend.IPv4.entity.FinalQuizResult;
 import com.backend.IPv4.entity.ProgressEntity;
 import com.backend.IPv4.entity.UserEntity;
+import com.backend.IPv4.repository.FinalQuizRepository;
 import com.backend.IPv4.repository.ProgressRepository;
 import com.backend.IPv4.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,10 @@ public class ProgressService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired 
+    private  FinalQuizRepository finalQuizRepository;
+
 
     public List<ProgressEntity> getProgressByUsername(String username) {
         return progressRepository.findByUserUsername(username);
@@ -49,5 +56,17 @@ public class ProgressService {
         }
     }
 
+    public void saveFinalQuizResult(FinalQuizRequest request) {
+        String username = request.getUsername();
+        int score = request.getScore();
+        boolean completed = request.isCompleted();
+        UserEntity user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("User not found with username: " + username);
+        }
 
+        FinalQuizResult finalQuizResult = new FinalQuizResult(score, completed, user);
+        finalQuizRepository.save(finalQuizResult);
+    }
+    
 }
