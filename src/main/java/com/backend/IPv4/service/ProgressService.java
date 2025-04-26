@@ -57,16 +57,17 @@ public class ProgressService {
     }
 
     public void saveFinalQuizResult(FinalQuizRequest request) {
-        String username = request.getUsername();
+        String email = request.getUsername();  // rename username to email if needed
         int score = request.getScore();
         boolean completed = request.isCompleted();
-        UserEntity user = userRepository.findByUsername(username);
+
+        UserEntity user = userRepository.findByEmail(email);  // use email here consistently
         if (user == null) {
-            throw new RuntimeException("User not found with username: " + username);
+            throw new RuntimeException("User not found with email: " + email);
         }
 
         FinalQuizResult finalQuizResult = new FinalQuizResult(score, completed, user);
         finalQuizRepository.save(finalQuizResult);
     }
-    
+
 }

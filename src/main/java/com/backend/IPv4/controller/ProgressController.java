@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,6 +32,7 @@ public class ProgressController {
     @Autowired private ProgressService progressService;    
     @Autowired private UserRepository userRepository;
     @Autowired private LoginHistoryRepository loginHistoryRepository;
+    @Autowired private FinalQuizRepository finalQuizRepository;
     
 
     // Get all progress for a user
@@ -97,6 +99,19 @@ public class ProgressController {
     public ResponseEntity<?> saveFinalQuizResult(@RequestBody FinalQuizRequest request) {
         progressService.saveFinalQuizResult(request);
         return ResponseEntity.ok("Final quiz result saved successfully");
+    }
+    
+    @GetMapping("/final-quiz/score/{email}")
+    public ResponseEntity<Integer> getFinalQuizScoreByEmail(@PathVariable String email) {
+        System.out.println("Fetching final quiz score for email: " + email);
+        UserEntity user = userRepository.findByEmail(email);
+        if (user == null) {
+            System.out.println("User not found with email: " + email);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return finalQuizRepository.findByUser(user)
+                .map(result -> ResponseEntity.ok(result.getScore()))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 
